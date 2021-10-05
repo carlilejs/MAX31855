@@ -11,27 +11,29 @@ import time
 # import RPi.GPIO as GPIO                         # TODO: change to gpiozero
 
 import board
-from digitalio import DigitalInOut, Direction
+from digitalio import *
 import adafruit_max31855
+import RPi.GPIO as GPIO
 
 
 # Define a function to convert celsius to fahrenheit.
 def c_to_f(temp_c):
     return temp_c * 9.0 / 5.0 + 32.0
 
-# Raspberry Pi software SPI configuration.
-CLK = 25
-CS = 24
-DO = 18
+# Raspberry Pi software SPI configuration (using GPIO pin names)
+SCLK = Pin(11)
+CE = Pin(8)
+MOSI = Pin(10)
+MISO = Pin(9)
 
 spi = board.SPI()
-sensor = adafruit_max31855.MAX31855(spi, digitalio.DigitalInOut(CS))
+sensor = adafruit_max31855.MAX31855(spi, DigitalInOut(CE))
 
 
-# thermocouple selector pins
-T0 = 17
-T1 = 27
-T2 = 22
+# thermocouple selector pins (using BOARD pin names)
+T0 = Pin(17)
+T1 = Pin(27)
+T2 = Pin(22)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(T0, GPIO.OUT)
