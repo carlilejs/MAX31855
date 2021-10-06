@@ -21,18 +21,19 @@ def c_to_f(temp_c):
 
 # Raspberry Pi software SPI configuration (using GPIO pin names)
 SCLK = 11
-CS = 8
+CS = 9
 MOSI = 10
 MISO = 9
 
 spi = board.SPI()
+# NOTE: This may need to be changed if GPIO9 doesn't work w/ SPI protocol.
 sensor = adafruit_max31855.MAX31855(spi, GPIO.setup(CS, GPIO.OUT))
 
 
-# thermocouple selector pins (using BOARD pin names)
+# thermocouple selector pins (using BCM pin names)
 T0 = 17 # GPIO17
-T1 = 27 # 
-T2 = 22
+T1 = 27 # GPIO27
+T2 = 22 # GPIO22
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(T0, GPIO.OUT)
@@ -42,14 +43,14 @@ GPIO.setup(T2, GPIO.OUT)
 # Loop printing measurements every second.
 print('Press Ctrl-C to quit.')
 
-thermocouple = 0 # Which channel am I referencing?
+channel = 0 # Which channel am I referencing?
 current_data = []
 
 while True:
     # bitwise operators select which thermocouple is to be referenced -- start at 0!
-    GPIO.output(T0, tc & 1<<0)
-    GPIO.output(T1, tc & 1<<1)
-    GPIO.output(T2, tc & 1<<2)
+    GPIO.output(T0, channel & 1<<0)
+    GPIO.output(T1, channel & 1<<1)
+    GPIO.output(T2, channel & 1<<2)
 
     time.sleep(0.125)
     temp = sensor.temperature()
@@ -62,13 +63,18 @@ while True:
     # print(' Internal Temperature: {0:0.3F}*C / {1:0.3F}*F'.format(internal, c_to_f(internal)))
 
     # TODO: Plot at the end of each cycle
+    
+    current_data.append(temp)
 
-    # if this is not the last thermocouple, add the data and move to next
-    if tc < 3:
-        current_data.append(temp)
-        tc += 1
+    if channel < 3:
+        channel += 1
     else:
-        current_data.append(temp.__str__())
+        current_data.append(internal)
         current_data.append(datetime.now().__str__())
 
-    tc = tc + 1 if tc < 3 else 0 # Adds one on tc = 0, 1, 2, and resets to 0 when tc = 3
+        data.write(current_data)
+        current_data = []
+
+        
+
+        channel = 0
