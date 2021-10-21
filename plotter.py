@@ -5,26 +5,16 @@
 # 
 
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import numpy
 
-#def plotSetup():
-plt.style.use('fivethirtyeight')
+plot = plt.plot([], [])
+
+def update_plot(plot, x_data, y_data):
+    plot.set_xdata(numpy.append(plot.get_data(), x_data))
+    plot.set_ydata(numpy.append(plot.get_ydata, y_data))
+    plt.draw()
+    plt.pause(0.01)
 
 
-
-def updatePlot(x_data, y_data, fieldnames):
-    ''' Provide y_data as a list of lists -- each a single dataset.
-        x_data should be a list (probably of time)
-        fieldnames should be a list "Therm 1", "Therm 2", ... '''
-
-    plt.clf()
-
-    for i in range( len(fieldnames) ):
-        line = ax.plot(x_data, y_data)
-
-    plt.show()
-
-plt.tight_layout()
-plt.show()
-
-plotSetup()
-updatePlot([1,2,3],[3,5,6],['First','Second','Third'])
+update_plot(plot, [1,2,3], [2,3,4])
